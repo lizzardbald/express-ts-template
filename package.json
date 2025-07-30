@@ -6,7 +6,9 @@
     "scripts": {
         "build": "npx tsc",
         "start": "node dist/index.js",
-        "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+        "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
+        "test": "mocha src/**/*.spec.ts",
+        "coverage": "nyc npm test"
     },
     "keywords": [
         "template",
@@ -20,39 +22,41 @@
     "author": "radnaxel-a",
     "license": "ISC",
     "dependencies": {
-        "dotenv": "^16.0.2",
+        "bcrypt": "^6.0.0",
         "cross-fetch": "^3.1.8",
+        "dotenv": "^16.0.2",
         "express": "^4.18.2",
-        "sequelize": "^6.37.7",
-        "ws": "^8.13.0",
         "express-jwt": "^8.4.1",
         "helmet": "^6.0.0",
         "jsonwebtoken": "^9.0.2",
-        "bcrypt": "^6.0.0"
+        "pg": "^8.16.3",
+        "pg-hstore": "^2.3.4",
+        "sequelize": "^6.37.7",
+        "ws": "^8.13.0"
     },
     "devDependencies": {
-        "@types/cors": "^2.8.13",
-        "@types/express": "^4.17.17",
-        "@types/ioredis": "^5.0.0",
-        "@types/node": "^24.0.14",
-        "@types/node-cron": "^3.0.11",
-        "@types/ws": "^8.5.5",
-        "cors": "^2.8.5",
-        "ts-node": "^10.9.2",
-        "tsx": "^4.19.2",
-        "typescript": "^5.8.3",
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@types/bcrypt": "^5.0.2",
         "@types/chai": "^5.0.1",
+        "@types/cors": "^2.8.13",
+        "@types/express": "^4.17.17",
+        "@types/ioredis": "^5.0.0",
         "@types/mocha": "^10.0.10",
+        "@types/node": "^24.0.14",
+        "@types/node-cron": "^3.0.11",
         "@types/sequelize": "^4.28.20",
         "@types/sinon": "^17.0.3",
+        "@types/ws": "^8.5.5",
         "chai": "^5.1.2",
         "concurrently": "^7.4.0",
+        "cors": "^2.8.5",
         "mocha": "^11.0.1",
         "nodemon": "^2.0.20",
         "nyc": "^17.1.0",
         "sinon": "^19.0.2",
-        "source-map-support": "^0.5.21"
+        "source-map-support": "^0.5.21",
+        "ts-node": "^10.9.2",
+        "tsx": "^4.19.2",
+        "typescript": "^5.8.3"
     }
 }

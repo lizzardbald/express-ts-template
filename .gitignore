@@ -2,3 +2,5 @@ node_modules/*
 dist/*
 .vscode
 .prettierrc
+coverage
+.nyc_output

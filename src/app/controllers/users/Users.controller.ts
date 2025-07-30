@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { Routes } from '../../config/Routes.enum';
 import { Method } from '../../interfaces/Method.enum';
 import { Controller } from '../Controller';
+import { User } from '../../models/User.model';
+import * as bcrypt from 'bcrypt';
 
 export class UsersController extends Controller {
     /**
@@ -11,16 +13,27 @@ export class UsersController extends Controller {
         super(Routes.Users);
     }
 
-    public [Method.GET_BY_ID](request: Request, response: Response): void {
-        response.send('users get by id');
+    public async [Method.GET_BY_ID](request: Request, response: Response) {
+        response.send('get user by id');
     }
 
-    public [Method.GET](request: Request, response: Response): void {
-        response.send('users get normal');
+    public async [Method.GET](request: Request, response: Response) {
+        const users = await User.findAll();
+
+        response.send(JSON.stringify(users));
     }
 
-    public [Method.POST](request: Request, response: Response): void {
-        response.send('users post ' + request.params.uid);
+    public async [Method.POST](request: Request, response: Response) {
+        const salt = await bcrypt.genSalt();
+        const passHash = await bcrypt.hash('strong pass', salt);
+        const user = await User.create({
+            id: crypto.randomUUID(),
+            name: 'opa',
+            password: passHash,
+            freeRequests: 20,
+        });
+
+        response.send('users post ' + user.id);
     }
 
     public [Method.PUT](request: Request, response: Response): void {

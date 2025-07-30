@@ -1,3 +1,5 @@
+import { Routes } from '../config/Routes.enum';
+
 export interface IController {
-    path: string;
+    path: Routes;
 }

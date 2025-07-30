@@ -1,6 +1,7 @@
 export enum Method {
-    GET = 'get',
-    POST = 'post',
-    PUT = 'put',
-    DELETE = 'delete'
+    GET = "get",
+    GET_BY_ID = "getById",
+    POST = "post",
+    PUT = "put",
+    DELETE = "delete",
 }

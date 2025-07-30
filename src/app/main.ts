@@ -5,6 +5,7 @@ import { Controller } from './controllers/Controller';
 import { Sequelize } from 'sequelize';
 import { Models } from './config/Models';
 import { CustomRoutes } from './config/CustomRoutes';
+import { Router } from 'express';
 
 export class Main {
     public express: Express;
@@ -49,22 +50,27 @@ export class Main {
         const controllers = new Controllers().create(this.dbContext);
 
         for (const ctrl of controllers) {
-            this.express[Method.GET](`/${ctrl.path}`, (req: Request, res: Response) => {
+            const router = Router();
+
+            router[Method.GET](`/`, (req: Request, res: Response) => {
                 this.prepareController(ctrl, Method.GET, req, res);
             });
-            this.express[Method.GET](`/${ctrl.path}/:id`, (req: Request, res: Response) => {
+            router[Method.GET](`/:uid`, (req: Request, res: Response) => {
                 this.prepareController(ctrl, Method.GET_BY_ID, req, res);
             });
-            this.express[Method.POST](`/${ctrl.path}`, (req: Request, res: Response) => {
+            router[Method.POST](`/`, (req: Request, res: Response) => {
                 this.prepareController(ctrl, Method.POST, req, res);
             });
-            this.express[Method.PUT](`/${ctrl.path}/:uid`, (req: Request, res: Response) => {
+            router[Method.PUT](`/:uid`, (req: Request, res: Response) => {
                 this.prepareController(ctrl, Method.PUT, req, res);
             });
-            this.express[Method.DELETE](`/${ctrl.path}/:uid`, (req: Request, res: Response) => {
+            router[Method.DELETE](`/:uid`, (req: Request, res: Response) => {
                 this.prepareController(ctrl, Method.DELETE, req, res);
             });
-            this.prepareCustomEndpoints(ctrl);
+
+            this.prepareCustomEndpoints(ctrl, router);
+
+            this.express.use(`/${ctrl.path}`, router);
         }
     }
 
@@ -73,7 +79,7 @@ export class Main {
         controller[method](req, res);
     }
 
-    private prepareCustomEndpoints(controller: Controller) {
+    private prepareCustomEndpoints(controller: Controller, router: Router) {
         if (!CustomRoutes[controller.path]) {
             return;
         }
@@ -85,7 +91,7 @@ export class Main {
                 method = Method.GET;
             }
 
-            (this.express as any)[method](`/${controller.path}/${path}`, (req: Request, res: Response) => {
+            (router as any)[method](`/${path}`, (req: Request, res: Response) => {
                 (controller as any)[route.endpoint](req, res);
             });
         }

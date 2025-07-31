@@ -26,7 +26,7 @@ export class Main {
         );
     }
 
-    public init(): void {
+    public bootstrap(): void {
         this.initOrm();
         this.createControllers();
     }

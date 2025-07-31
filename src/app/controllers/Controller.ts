@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import { IController } from '../interfaces/IController.interface';
 import { AuthService } from '../services/Auth.service';
@@ -22,9 +22,9 @@ export abstract class Controller implements IController {
         return user as User;
     }
 
-    abstract getById(request: Request, response: Response): void;
-    abstract get(request: Request, response: Response): void;
-    abstract post(request: Request, response: Response): void;
-    abstract put(request: Request, response: Response): void;
-    abstract delete(request: Request, response: Response): void;
+    abstract getById(request: Request, response: Response, next?: NextFunction): void;
+    abstract get(request: Request, response: Response, next?: NextFunction): void;
+    abstract post(request: Request, response: Response, next?: NextFunction): void;
+    abstract put(request: Request, response: Response, next?: NextFunction): void;
+    abstract delete(request: Request, response: Response, next?: NextFunction): void;
 }

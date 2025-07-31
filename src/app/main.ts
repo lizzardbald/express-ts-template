@@ -1,4 +1,4 @@
-import { Express, Request, Response } from 'express';
+import { Express, NextFunction, Request, Response } from 'express';
 import { Method } from './interfaces/Method.enum';
 import { Controllers } from './config/Controllers';
 import { Controller } from './controllers/Controller';
@@ -6,6 +6,7 @@ import { Sequelize } from 'sequelize';
 import { Models } from './config/Models';
 import { CustomRoutes } from './config/CustomRoutes';
 import { Router } from 'express';
+import { Middlewares } from './config/Middlewares';
 
 export class Main {
     public express: Express;
@@ -52,20 +53,22 @@ export class Main {
         for (const ctrl of controllers) {
             const router = Router();
 
-            router[Method.GET](`/`, (req: Request, res: Response) => {
-                this.prepareController(ctrl, Method.GET, req, res);
+            this.prepareMiddlewares(ctrl, router);
+
+            router[Method.GET](`/`, (req: Request, res: Response, next: NextFunction) => {
+                this.prepareController(ctrl, Method.GET, req, res, next);
             });
-            router[Method.GET](`/:uid`, (req: Request, res: Response) => {
-                this.prepareController(ctrl, Method.GET_BY_ID, req, res);
+            router[Method.GET](`/:uid`, (req: Request, res: Response, next: NextFunction) => {
+                this.prepareController(ctrl, Method.GET_BY_ID, req, res, next);
             });
-            router[Method.POST](`/`, (req: Request, res: Response) => {
-                this.prepareController(ctrl, Method.POST, req, res);
+            router[Method.POST](`/`, (req: Request, res: Response, next: NextFunction) => {
+                this.prepareController(ctrl, Method.POST, req, res, next);
             });
-            router[Method.PUT](`/:uid`, (req: Request, res: Response) => {
-                this.prepareController(ctrl, Method.PUT, req, res);
+            router[Method.PUT](`/:uid`, (req: Request, res: Response, next: NextFunction) => {
+                this.prepareController(ctrl, Method.PUT, req, res, next);
             });
-            router[Method.DELETE](`/:uid`, (req: Request, res: Response) => {
-                this.prepareController(ctrl, Method.DELETE, req, res);
+            router[Method.DELETE](`/:uid`, (req: Request, res: Response, next: NextFunction) => {
+                this.prepareController(ctrl, Method.DELETE, req, res, next);
             });
 
             this.prepareCustomEndpoints(ctrl, router);
@@ -74,9 +77,29 @@ export class Main {
         }
     }
 
-    private prepareController(controller: Controller, method: Method, req: Request, res: Response): void {
+    private prepareMiddlewares(controller: Controller, router: Router) {
+        if (!Middlewares[controller.path]) {
+            return;
+        }
+
+        const middlewaresForRoute = Middlewares[controller.path].map((ml) => new ml());
+
+        for (const middleware of middlewaresForRoute) {
+            router.use('/', middleware.process);
+        }
+
+        console.log('Middlewares prepare');
+    }
+
+    private prepareController(
+        controller: Controller,
+        method: Method,
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): void {
         controller.jwt = req.headers.authorization;
-        controller[method](req, res);
+        controller[method](req, res, next);
     }
 
     private prepareCustomEndpoints(controller: Controller, router: Router) {

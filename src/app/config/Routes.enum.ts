@@ -1,3 +1,5 @@
+const defaultVersion = 'v1';
+
 export enum Routes {
-    Users = 'users'
+    Users = `api/${defaultVersion}/users`,
 }

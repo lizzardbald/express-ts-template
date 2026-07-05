@@ -6,6 +6,7 @@ import { User } from '../../models/User.model';
 import * as bcrypt from 'bcrypt';
 
 export class UsersController extends Controller {
+    public static path: Routes = Routes.Users;
     /**
      * Set the route for this controller in super()
      */

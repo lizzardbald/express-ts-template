@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 
 import { IController } from '../interfaces/IController.interface';
 import { AuthService } from '../services/Auth.service';
-import { User } from '../models/User.model';
 import { Routes } from '../config/Routes.enum';
+import { Prisma } from '../services/prisma/Prisma';
 
 export abstract class Controller implements IController {
     public path: Routes;
@@ -15,11 +15,15 @@ export abstract class Controller implements IController {
         this.authService = new AuthService();
     }
 
-    public async getUser(): Promise<User> {
+    public async getUser(): Promise<any> {
         const decodedToken: any = this.authService.decodeToken(this.jwt as string);
-        const user = await User.findByPk(decodedToken.id);
+        const user = await Prisma.context.users.findUnique({
+            where: {
+                id: decodedToken.id,
+            },
+        });
 
-        return user as User;
+        return user;
     }
 
     abstract getById(request: Request, response: Response, next?: NextFunction): void;

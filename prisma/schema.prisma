@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model roles {
+  id         String       @id
+  name       String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  user_roles user_roles[]
+}
+
+model user_activities {
+  id        String   @id
+  userId    String
+  type      String
+  action    String
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([type, createdAt])
+  @@index([userId, createdAt])
+}
+
+model user_roles {
+  id        String   @id
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  roles     roles    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id              String            @id
+  names           String
+  email           String            @unique
+  password        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  user_activities user_activities[]
+  user_roles      user_roles[]
+}

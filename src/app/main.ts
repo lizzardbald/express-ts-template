@@ -2,60 +2,46 @@ import { Express, NextFunction, Request, Response } from 'express';
 import { Method } from './interfaces/Method.enum';
 import { Controllers } from './config/Controllers';
 import { Controller } from './controllers/Controller';
-import { Models } from './config/Models';
 import { CustomRoutes } from './config/CustomRoutes';
 import { Router } from 'express';
 import { Middlewares } from './config/Middlewares';
 import { Constructable } from './interfaces/Constructable.interface';
-import { Sequelize } from 'sequelize';
 import { ErrorMiddleware } from './interfaces/middleware/ErrorMiddleware.interface';
 import { BasicMiddleware } from './interfaces/middleware/BasicMiddleware.interface';
 import { Logger } from './services/logger/Logger.service';
 import { WebSocketService } from './services/web-socket/WebSocket.service';
 import { Server } from 'http';
+import { Prisma } from './services/prisma/Prisma';
 
 export class Main {
     public express: Express;
-    private readonly dbContext: any;
     private server!: Server;
 
     constructor(_express: Express) {
         this.express = _express;
-
-        this.dbContext = new Sequelize(
-            process.env.DB_NAME || 'mydatabase',
-            process.env.DB_USER || 'postgres',
-            process.env.DB_PASSWORD || 'mysecretpassword',
-            {
-                host: process.env.DB_HOST || '127.0.0.1',
-                dialect: 'postgres', // Specify dialect
-                logging: false,
-            }
-        );
     }
 
     public bootstrap(): void {
         this.setGlobalErrorHandler()
-        // this.initOrm();
-        this.createControllers();
-        this.startWebServer();
-        this.startWebSocket();
+        this.initOrm()
+        .then(() => {
+            this.createControllers();
+            this.startWebServer();
+            this.startWebSocket();
+        })
+        .catch((error: any) => {
+            Logger.error(error.message);
+        });
     }
 
-    private initOrm(): void {
-        const models = new Models();
-        const modelMap = models.create(this.dbContext);
-
-        models.associate(modelMap);
-
-        this.dbContext
-            .sync({ alter: true })
-            .then(() => {
-                Logger.log('Database synced');
-            })
-            .catch((error: any) => {
-                Logger.error(error.message);
-            });
+    private async initOrm(): Promise<void> {
+        await Prisma.context.$connect()
+        .then(() => {
+            Logger.log('Prisma connected successfully');
+        })
+        .catch((error: any) => {
+            Logger.error(error.message);
+        });
     }
 
     private createControllers(): void {

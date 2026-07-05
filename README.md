@@ -1,25 +1,30 @@
 # express-ts-template
 
+## Descritpion
 
-
-## Descritpion 
-Express js project template with TypeScript. 
+Express js project template with TypeScript.
 If you like this template, give it a ⭐
 
+### Note
+
+This project uses sequalize as ORM. If you are more familiar with prisma, checkout main-prisma branch.
+
 ## How to run
-If you want to use this project template you can run: 
+
+If you want to use this project template you can run:
 
 1. run `git clone https://github.com/radnaxel-a/express-ts-template.git`
 2. run `cd express-ts-example`
 3. run `npm i`
-4. run `rm -rf .git` or delete the `.git` folder to remove the repo link 
-5. run `npm run dev` to compile and run 
+4. run `rm -rf .git` or delete the `.git` folder to remove the repo link
+5. run `npm run dev` to compile and run
 6. open your browser at `localhost:8080`
 
 ## Adding more controllers
 
 1. Create your controller in the `src/app/controllers/` folder.
 2. Extend the `Controller` abstract class and implement it. This will give you the opportunity to use basic CRUD operations.
+
 ```
 export abstract class Controller implements IController {
     public path: string;
@@ -27,7 +32,7 @@ export abstract class Controller implements IController {
     constructor(_path: string) {
         this.path = _path;
     }
-    
+
     abstract get(request: Request, response: Response): void
     abstract post(request: Request, response: Response): void;
     abstract put(request: Request, response: Response): void;
@@ -36,6 +41,7 @@ export abstract class Controller implements IController {
 ```
 
 You can write your business logic in the child classes as you would in a normal express js callback:
+
 ```
 export class UsersController extends Controller {
     /**
@@ -53,7 +59,7 @@ export class UsersController extends Controller {
         response.send('users post ' + request.params.uid);
     }
 
-    public [Method.PUT](request: Request, response: Response): void {  
+    public [Method.PUT](request: Request, response: Response): void {
         response.send('users put ' + request.params.uid);
     }
 
@@ -62,7 +68,6 @@ export class UsersController extends Controller {
     }
 }
 ```
-
 
 3. Add your controller route in the `Route.ts` file under `src/app/config/Routes.ts`
 
@@ -104,7 +109,8 @@ export class Controllers {
 In the `UsersController` is left as an example to you how to do it.
 
 ## Routes
-The routes are created in the main class under `src/main.ts`. 
+
+The routes are created in the main class under `src/main.ts`.
 
 ```
  private createControllers(): void {
@@ -119,4 +125,4 @@ The routes are created in the main class under `src/main.ts`.
     }
 ```
 
-If you wish to have other methods added, they can be added in the `Method` enum file. 
+If you wish to have other methods added, they can be added in the `Method` enum file.

@@ -10,6 +10,7 @@ import { Constructable } from './interfaces/Constructable.interface';
 import { Sequelize } from 'sequelize';
 import { ErrorMiddleware } from './interfaces/middleware/ErrorMiddleware.interface';
 import { BasicMiddleware } from './interfaces/middleware/BasicMiddleware.interface';
+import { Logger } from './services/logger/Logger.service';
 
 export class Main {
     public express: Express;
@@ -31,6 +32,7 @@ export class Main {
     }
 
     public bootstrap(): void {
+        this.setGlobalErrorHandler()
         this.initOrm();
         this.createControllers();
     }
@@ -44,10 +46,10 @@ export class Main {
         this.dbContext
             .sync({ alter: true })
             .then(() => {
-                console.log('Database synced');
+                Logger.log('Database synced');
             })
             .catch((error: any) => {
-                console.error(error.message);
+                Logger.error(error.message);
             });
     }
 
@@ -99,7 +101,7 @@ export class Main {
             router.use('/', middleware.process);
         }
 
-        console.log('Middlewares prepare');
+        Logger.log('Middlewares prepare');
     }
 
     private prepareController(
@@ -130,5 +132,14 @@ export class Main {
                 },
             );
         }
+    }
+
+    private setGlobalErrorHandler(): void {
+        process.on('uncaughtException', (err: Error) => {
+            Logger.error(`There was an uncaught error: ${err.message}`);
+        });
+        process.on('unhandledRejection', (err: Error) => {
+            Logger.error(`There was an uncaught error: ${err.message}`);
+        });
     }
 }

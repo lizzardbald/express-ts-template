@@ -19,9 +19,7 @@ export class UsersController extends Controller {
     }
 
     public async [Method.GET](request: Request, response: Response) {
-        const users = await User.findAll();
-
-        response.send(JSON.stringify(users));
+        response.send('get users');
     }
 
     public async [Method.POST](request: Request, response: Response) {

@@ -7,7 +7,6 @@ import cors from 'cors';
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 8080;
 
 app.use(helmet());
 app.use(json());
@@ -22,7 +21,3 @@ app.use(
 );
 
 new Main(app).bootstrap();
-
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-});

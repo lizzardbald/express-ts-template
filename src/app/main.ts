@@ -11,10 +11,13 @@ import { Sequelize } from 'sequelize';
 import { ErrorMiddleware } from './interfaces/middleware/ErrorMiddleware.interface';
 import { BasicMiddleware } from './interfaces/middleware/BasicMiddleware.interface';
 import { Logger } from './services/logger/Logger.service';
+import { WebSocketService } from './services/web-socket/WebSocket.service';
+import { Server } from 'http';
 
 export class Main {
     public express: Express;
     private readonly dbContext: any;
+    private server!: Server;
 
     constructor(_express: Express) {
         this.express = _express;
@@ -33,8 +36,10 @@ export class Main {
 
     public bootstrap(): void {
         this.setGlobalErrorHandler()
-        this.initOrm();
+        // this.initOrm();
         this.createControllers();
+        this.startWebServer();
+        this.startWebSocket();
     }
 
     private initOrm(): void {
@@ -134,12 +139,40 @@ export class Main {
         }
     }
 
+    private startWebServer(): void {
+        const port = process.env.PORT || 8080;
+
+        this.server = this.express.listen(port, () => {
+            let message = 'HTTP Server is started';
+
+            if (process.env.NODE_ENV === 'development') {
+                message = `HTTP Server is started in development mode on port ${port}`;
+            }
+
+            Logger.log(message);
+        });
+    }
+
+    private startWebSocket(): void {
+        Logger.log('Starting WebSocket...');
+        WebSocketService.createWebSockerInstance(this.server as any);
+    }
+    
     private setGlobalErrorHandler(): void {
         process.on('uncaughtException', (err: Error) => {
-            Logger.error(`There was an uncaught error: ${err.message}`);
+            if (process.env.NODE_ENV === 'development') {
+                console.error(err);
+            } else {
+                Logger.error(`There was an uncaught error: ${err.message}`);
+            }
         });
+
         process.on('unhandledRejection', (err: Error) => {
-            Logger.error(`There was an uncaught error: ${err.message}`);
+            if (process.env.NODE_ENV === 'development') {
+                console.error(err);
+            } else {
+                Logger.error(`There was an unhadled error: ${err.message}`);
+            }
         });
     }
 }
